@@ -1,10 +1,3 @@
-# Program: chatclient.py
-# Authors: Michael H. Goldwasser
-#          David Letscher
-#
-# This example is discussed in Chapter 16 of the book
-# Object-Oriented Programming in Python
-#
 from socket import socket
 from threading import Thread
  
@@ -31,40 +24,3 @@ class IncomingThread(Thread):
           i += 1                            # need next line for content
           print('==> %s [private]: %s' % (param, lines[i]))
         i += 1
- 
-instructions = """
---------------------------------------------
-Welcome to the chat room.
- 
-To quit, use syntax,
-  quit
- 
-To send private message to 'Joe' use syntax,
-  private Joe:how are you?
- 
-To send message to everyone, use syntax,
-  hi everyone!
---------------------------------------------
-"""
- 
-server = socket()                                   # shared by both threads
-server.connect( ('172.20.46.124', 8080) )               # could be a remote host
-username = input('Chen:').strip()
-server.send(('ADD %s\n' % username).encode() )
-incoming = IncomingThread()
-incoming.start()
- 
-print(instructions)
-active = True                                       # main thread for user input
-while active:   
-  message = input()                             # wait for more user input
-  if message.strip():
-    if message.rstrip().lower() == 'quit':
-      server.send('QUIT\n'.encode())
-      active = False
-    elif message.split()[0].lower() == 'private':
-      colon = message.index(':')
-      friend = message[7:colon].strip()
-      server.send(('PRIVATE %s\n%s\n' % (friend,message[1+colon: ])).encode() )
-    else:
-      server.send(('MESSAGE' + message).encode())
